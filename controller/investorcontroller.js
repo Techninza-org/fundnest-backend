@@ -337,3 +337,48 @@ exports.getIdeas = async (req, res) => {
     });
   }
 };
+
+exports.likeIdea = async (req, res) => {
+  try {
+    const { ideaId } = req.body; // Get idea ID from request body
+    const userId = req.user._id; // Get user ID from middleware (authenticated user)
+
+    // Find the idea by ID
+    const idea = await Business.findById(ideaId);
+    if (!idea) {
+      return res.status(404).json({
+        status: "failed",
+        message: "Business idea not found",
+      });
+    }
+
+    // Check if the user has already liked the idea
+    if (idea.likedBy.includes(userId)) {
+      return res.status(400).json({
+        status: "failed",
+        message: "You have already liked this idea",
+      });
+    }
+
+    // Increment the like count and add the user to the likedBy array
+    idea.likeCount += 1;
+    idea.likedBy.push(userId);
+
+    // Save the updated idea
+    await idea.save();
+
+    // Send success response
+    return res.status(200).json({
+      status: "success",
+      message: "Business idea liked successfully",
+      likeCount: idea.likeCount,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "error",
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};

@@ -10,6 +10,7 @@ const {
   sendMessageToEntrepreneur,
   getMessagesWithEntrepreneur,
   getIdeas,
+  likeIdea,
 } = require("../controller/investorcontroller");
 const { middleware } = require("../middleware/jwtmiddleware");
 
@@ -27,5 +28,6 @@ router.get("/messages/:roomId", getMessagesWithEntrepreneur);
 router.post("/search-entrepreneur", searchEntrepreneursByName);
 
 router.get("/get-ideas/all", getIdeas);
+router.post("/likeIdea", middleware, likeIdea);
 
 module.exports = router;
