@@ -319,13 +319,13 @@ exports.getMessagesWithEntrepreneur = async (req, res) => {
 
 exports.getIdeas = async (req, res) => {
   try {
-    // Fetch all business ideas from the database
-    const ideas = await Business.find();
+    // Fetch all business ideas from the database, sorted by likeCount in descending order
+    const ideas = await Business.find().sort({ likeCount: -1 });
 
-    // Send the response with the retrieved business ideas
+    // Send the response with the ranked business ideas
     return res.status(200).json({
       status: "success",
-      message: "Business ideas retrieved successfully",
+      message: "Business ideas retrieved and ranked by likes successfully",
       ideas: ideas,
     });
   } catch (error) {
