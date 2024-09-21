@@ -374,3 +374,47 @@ exports.buyCourse = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
+exports.getCourses = async (req, res) => {
+  try {
+    const userId = req.user._id; // Get authenticated user ID from middleware
+
+    // Find the user by ID to retrieve their myCourses array
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "failed",
+        message: "User not found",
+      });
+    }
+
+    // Get the list of course IDs the user has purchased
+    const courseIds = user.myCourses;
+
+    // If no courses have been purchased, return an empty array
+    if (courseIds.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "No courses purchased",
+        courses: [],
+      });
+    }
+
+    // Fetch full course details from the Courses collection using the course IDs
+    const courses = await Course.find({ _id: { $in: courseIds } });
+
+    // Send the response with the list of purchased course details
+    return res.status(200).json({
+      status: "success",
+      message: "Courses retrieved successfully",
+      courses: courses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "error",
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};

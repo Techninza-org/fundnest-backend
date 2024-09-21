@@ -12,6 +12,7 @@ const {
   getMessagesByRoomId,
   getConsults,
   buyCourse,
+  getCourses,
 } = require("../controller/enterprenuercontroller");
 const { middleware } = require("../middleware/jwtmiddleware");
 
@@ -29,5 +30,7 @@ router.get("/:roomId", getMessagesByRoomId);
 router.get("/consults/all", getConsults);
 
 router.post("/buy-course", middleware, buyCourse);
+
+router.get("/get-courses/all", middleware, getCourses);
 
 module.exports = router;
