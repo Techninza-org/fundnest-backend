@@ -316,3 +316,24 @@ exports.getMessagesWithEntrepreneur = async (req, res) => {
 //         return res.status(500).json({ message: 'Internal server error', error: error.message });
 //     }
 // };
+
+exports.getIdeas = async (req, res) => {
+  try {
+    // Fetch all business ideas from the database
+    const ideas = await Business.find();
+
+    // Send the response with the retrieved business ideas
+    return res.status(200).json({
+      status: "success",
+      message: "Business ideas retrieved successfully",
+      ideas: ideas,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "error",
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};

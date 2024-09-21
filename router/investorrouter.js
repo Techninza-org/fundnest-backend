@@ -9,6 +9,7 @@ const {
   getEntrepreneurById,
   sendMessageToEntrepreneur,
   getMessagesWithEntrepreneur,
+  getIdeas,
 } = require("../controller/investorcontroller");
 const { middleware } = require("../middleware/jwtmiddleware");
 
@@ -24,5 +25,7 @@ router.post(
 );
 router.get("/messages/:roomId", getMessagesWithEntrepreneur);
 router.post("/search-entrepreneur", searchEntrepreneursByName);
+
+router.get("/get-ideas/all", getIdeas);
 
 module.exports = router;
