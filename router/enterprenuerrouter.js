@@ -11,6 +11,7 @@ const {
   getMessagesWithInvestor,
   getMessagesByRoomId,
   getConsults,
+  buyCourse,
 } = require("../controller/enterprenuercontroller");
 const { middleware } = require("../middleware/jwtmiddleware");
 
@@ -26,5 +27,7 @@ router.get("/express-interest/:investorId", middleware, sendInterest); //send em
 router.get("/:roomId", getMessagesByRoomId);
 
 router.get("/consults/all", getConsults);
+
+router.post("/buy-course", middleware, buyCourse);
 
 module.exports = router;

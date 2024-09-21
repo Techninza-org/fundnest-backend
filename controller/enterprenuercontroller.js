@@ -4,7 +4,7 @@ const ChatMessage = require("../model/ChatMessage");
 const Business = require("../model/BusinessIdea");
 const nodemailer = require("nodemailer");
 const Consult = require("../model/consult");
-const consult = require("../model/consult");
+const Course = require("../model/courses");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -331,5 +331,46 @@ exports.getConsults = async (req, res) => {
       message: "Error fetching consults",
       error: error.message,
     });
+  }
+};
+
+exports.buyCourse = async (req, res) => {
+  try {
+    const { courseId } = req.body; // Get course ID from the request body
+    const userId = req.user._id; // Get the authenticated user ID from middleware
+
+    // Find the course by ID
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Check if the user has already bought the course
+    if (user.myCourses.includes(courseId)) {
+      return res.status(400).json({ message: "Course already purchased" });
+    }
+
+    // Add the course to the user's myCourses array
+    user.myCourses.push(courseId);
+
+    // Save the updated user document
+    await user.save();
+
+    // Send success response
+    return res.status(200).json({
+      message: "Course purchased successfully",
+      userCourses: user.myCourses,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };
