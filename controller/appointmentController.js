@@ -1,11 +1,23 @@
 const Appointment = require("../model/appointment");
 const Razorpay = require("razorpay");
+const nodemailer = require("nodemailer");
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
   key_id: "rzp_test_n5oTuMseyDclhS",
   key_secret: "eR0Agm0HEGChnUp5Oi1mqUWc",
 });
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  auth: {
+    user: "indiaglobal0@gmail.com",
+    pass: "icjp zmmc twyq yncd ",
+  },
+});
+
+transporter.verify().then(console.log).catch(console.error);
 
 // Create a new appointment
 exports.createAppointment = async (req, res) => {
@@ -19,15 +31,25 @@ exports.createAppointment = async (req, res) => {
       currency,
       consult_id,
       consultName,
+      consultEmail,
     } = req.body;
 
     const userId = req.user._id;
-    const email = req.user.email;
+    const userEmail = req.user.email;
     const myemail = "indiaglobal@gmail.com";
+
+    // Validate required fields
+    if (!amount || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ error: "Invalid amount provided." });
+    }
+
+    if (!currency) {
+      return res.status(400).json({ error: "Currency is required." });
+    }
 
     // Create Razorpay order
     const options = {
-      amount: amount * 100, // Amount in paisa
+      amount: amount * 100, // Amount in paisa (e.g., 1000 for 10 INR)
       currency,
       receipt: `receipt_order_${new Date().getTime()}`,
     };
@@ -47,7 +69,44 @@ exports.createAppointment = async (req, res) => {
     });
 
     const savedAppointment = await newAppointment.save();
-    res.status(201).json({ appointment: savedAppointment, razorpayOrder });
+
+    // Email sending logic
+    const sendEmails = async () => {
+      try {
+        const userMailOptions = {
+          from: myemail,
+          to: userEmail,
+          subject: "Appointment Confirmation",
+          text: `Dear ${customerName},\n\nYour appointment with ${consultName} has been confirmed for ${date} at ${timeslot}.\n\nThank you for using our service.`,
+        };
+
+        const consultantMailOptions = {
+          from: myemail,
+          to: consultEmail,
+          subject: "New Appointment Scheduled",
+          text: `Dear ${consultName},\n\nA new appointment has been scheduled with ${customerName} for ${date} at ${timeslot}.\n\nPlease prepare accordingly.`,
+        };
+
+        await Promise.all([
+          transporter.sendMail(userMailOptions),
+          transporter.sendMail(consultantMailOptions),
+        ]);
+
+        console.log("Emails sent to both user and consultant.");
+      } catch (emailError) {
+        console.error("Error sending emails:", emailError);
+        throw new Error("Error sending emails.");
+      }
+    };
+
+    await sendEmails();
+
+    // Send response after emails and appointment are handled
+    res.status(201).json({
+      message: "Appointment saved and emails sent.",
+      appointment: savedAppointment,
+      razorpayOrder,
+    });
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: error.message });
