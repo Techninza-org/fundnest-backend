@@ -6,12 +6,17 @@ const nodemailer = require("nodemailer");
 const Consult = require("../model/consult");
 const Course = require("../model/courses");
 
+const dotenv = require("dotenv");
+
+// Load environment variables from .env file
+dotenv.config();
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   auth: {
-    user: "indiaglobal0@gmail.com",
-    pass: "icjp zmmc twyq yncd ",
+    user: process.env.EMAIL_USER || "indiaglobal0@gmail.com",
+    pass: process.env.EMAIL_PASS || "icjp zmmc twyq yncd ",
   },
 });
 
@@ -292,8 +297,8 @@ exports.sendInterest = async (req, res) => {
     const mailOptions = {
       from: "indiaglobal0@gmail.com",
       to: "indiaglobal0@gmail.com",
-      subject: "New Form Submission",
-      text: `You have a new form submission: ` + entrepreneurId,
+      subject: "Some interested in your profile",
+      text: `You have a new form intrest: ` + entrepreneurId,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {

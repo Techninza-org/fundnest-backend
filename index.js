@@ -47,7 +47,9 @@ app.use("/faqs", FAQs);
 app.use("/wallet", Wallet);
 
 // MongoDB connection
-const dbURI = "mongodb+srv://Fundnest:8877446687@fundnest.lris2bh.mongodb.net/"; // MongoDB remote
+const dbURI =
+  process.env.DBURI ||
+  "mongodb+srv://Fundnest:8877446687@fundnest.lris2bh.mongodb.net/"; // MongoDB remote
 
 mongoose
   .connect(dbURI)
@@ -59,7 +61,7 @@ mongoose
   });
 
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}`);
 });

@@ -1,19 +1,23 @@
 const Appointment = require("../model/appointment");
 const Razorpay = require("razorpay");
 const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
+
+// Load environment variables from .env file
+dotenv.config();
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
-  key_id: "rzp_test_n5oTuMseyDclhS",
-  key_secret: "eR0Agm0HEGChnUp5Oi1mqUWc",
+  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_n5oTuMseyDclhS",
+  key_secret: process.env.RAZORPAY_KEY_SECRET || "eR0Agm0HEGChnUp5Oi1mqUWc",
 });
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   auth: {
-    user: "indiaglobal0@gmail.com",
-    pass: "icjp zmmc twyq yncd ",
+    user: process.env.EMAIL_USER || "indiaglobal0@gmail.com",
+    pass: process.env.EMAIL_PASS || "icjp zmmc twyq yncd ",
   },
 });
 
